@@ -1,15 +1,65 @@
 import numpy as np
 import cv2
-import matplotlib as plt
+from matplotlib import pyplot as plt
 
 
-from model.img_tgt import TGT_IMG
+from sr_model.tgt_img import TGT_IMG
+from sr_model.nnb     import NNB
+
 
 bmp_path = './jpg/LenaRGB.bmp'
 tif_path = './jpg/LenaRGB.tif'
 
-img = cv2.imread(bmp_path,0)
+########cv2 read color format is BGR, need to change to RGB
+img    = cv2.imread(bmp_path,1)
+scalor =  0.3
+tgt_w  = np.int(np.floor(img.shape[0]*scalor))
+tgt_h  = np.int(np.floor(img.shape[1]*scalor))
 
-cv2.imshow("my_win",img)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+img_lx  = 22
+img_hx  = 30
+img_ly  = 22
+img_hy  = 30
+if img.ndim == 3:
+    img_cut   = img[img_lx:img_hx,img_ly:img_hy,[2,1,0]]
+    img       = img[:,:,[2,1,0]]
+else:    
+    img_cut   = img[img_lx:img_hx,img_ly:img_hy]
+#cv2.imshow("my_win",img)
+#cv2.waitKey(0)
+#cv2.destroyAllWindows()
+
+
+######gen zero array for target image############
+tgt_img_ex = TGT_IMG(img,tgt_w,tgt_h)
+tgt_img_zr = tgt_img_ex.execute()
+
+img_w    = tgt_img_zr.img_w   
+img_h    = tgt_img_zr.img_h   
+tgt_img  = tgt_img_zr.tgt_img 
+tgt_w    = tgt_img_zr.tgt_w   
+tgt_h    = tgt_img_zr.tgt_h   
+
+print(img_cut.shape,img.shape,tgt_img.shape,img_w,img_h,tgt_w,tgt_h)
+nnb      = NNB(img,img_w,img_h,tgt_img,tgt_w,tgt_h)
+nnb_ex   = nnb.execute()
+img_nnb  = nnb_ex.tgt_img
+print(img_nnb.shape)
+
+dpi  = 80
+figsize_org  = img_w/dpi, img_h/dpi
+figsize_tgt  = tgt_w/dpi, tgt_h/dpi
+plt.figure('orign img',figsize=figsize_org)
+if img.ndim == 3:
+    plt.imshow(img)
+else:
+    plt.imshow(img,cmap='gray')
+
+plt.figure('img nnb',figsize=figsize_tgt)
+if img.ndim == 3:
+    plt.imshow(img_nnb)
+else:
+    plt.imshow(img_nnb,cmap='gray')
+#plt_img = plt.imshow(img,cmap='gray')
+plt.show()
+
