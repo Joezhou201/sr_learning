@@ -5,14 +5,15 @@ from matplotlib import pyplot as plt
 
 from sr_model.tgt_img import TGT_IMG
 from sr_model.nnb     import NNB
+from sr_model.bln     import BLN
 
 
 bmp_path = './jpg/LenaRGB.bmp'
 tif_path = './jpg/LenaRGB.tif'
 
 ########cv2 read color format is BGR, need to change to RGB
-img    = cv2.imread(bmp_path,1)
-scalor =  0.3
+img    = cv2.imread(bmp_path,0)
+scalor =  0.6
 tgt_w  = np.int(np.floor(img.shape[0]*scalor))
 tgt_h  = np.int(np.floor(img.shape[1]*scalor))
 
@@ -46,6 +47,11 @@ nnb_ex   = nnb.execute()
 img_nnb  = nnb_ex.tgt_img
 print(img_nnb.shape)
 
+bln      = BLN(img,img_w,img_h,tgt_img,tgt_w,tgt_h)
+bln_ex   = bln.execute()
+img_bln  = bln_ex.tgt_img
+print(img_bln.shape)
+
 dpi  = 80
 figsize_org  = img_w/dpi, img_h/dpi
 figsize_tgt  = tgt_w/dpi, tgt_h/dpi
@@ -60,6 +66,13 @@ if img.ndim == 3:
     plt.imshow(img_nnb)
 else:
     plt.imshow(img_nnb,cmap='gray')
+
+plt.figure('img bln',figsize=figsize_tgt)
+if img.ndim == 3:
+    plt.imshow(img_bln)
+else:
+    plt.imshow(img_bln,cmap='gray')
+
 #plt_img = plt.imshow(img,cmap='gray')
 plt.show()
 
