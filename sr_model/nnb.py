@@ -60,7 +60,7 @@ class NNB:
                         if min_d == 0:
                             self.tgt_img[i,j,k] = self.img[llx  ,lly  ,k]
                         elif min_d == 1:
-                            self.tgt_img[i,j,k] = self.img[llx  ,lly+2,k]
+                            self.tgt_img[i,j,k] = self.img[llx  ,lly+1,k]
                         elif min_d == 2:
                             self.tgt_img[i,j,k] = self.img[llx+1,lly  ,k]
                         else:           
